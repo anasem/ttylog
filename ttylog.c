@@ -30,6 +30,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <sys/time.h>
 #include <time.h>
 #include <errno.h>
 
@@ -59,9 +60,8 @@ main (int argc, char *argv[])
   int fd;
   char line[1024], modem_device[512];
   struct termios oldtio, newtio;
-  time_t rawtime;
-  struct tm *timeinfo;
-  char *timestr;
+  struct timeval tv;
+  char timestr[17];
 
   modem_device[0] = 0;
 
@@ -80,7 +80,7 @@ main (int argc, char *argv[])
           printf ("Usage:  ttylog [-b|--baud] [-d|--device] [-f|--flush] [-s|--stamp] [-t|--timeout] > /path/to/logfile\n");
           printf (" -h, --help	This help\n -v, --version	Version number\n -b, --baud	Baud rate\n");
           printf (" -d, --device	Serial device (eg. /dev/ttyS1)\n -f, --flush	Flush output\n");
-          printf (" -s, --stamp\tPrefix each line with datestamp\n");
+          printf (" -s, --stamp\tPrefix each line with Epoc Microseconds timestamp\n");
           printf (" -t, --timeout  How long to run, in seconds.\n");
           printf ("ttylog home page: <http://ttylog.sourceforge.net/>\n\n");
           exit (0);
@@ -221,11 +221,9 @@ main (int argc, char *argv[])
             }
           if (stamp)
             {
-              time(&rawtime);
-              timeinfo = localtime(&rawtime);
-              timestr = asctime(timeinfo);
-              timestr[strlen(timestr) - 1] = 0;
-              printf ("[%s] %s", timestr, line);
+              gettimeofday(&tv, NULL);
+              sprintf(timestr, "%ld", tv.tv_sec*(int)1e6 + tv.tv_usec);
+              printf ("%s %s", timestr, line);
             } else {
               fputs (line, stdout);
             }
