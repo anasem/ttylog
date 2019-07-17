@@ -33,7 +33,6 @@
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
-
 #include "config.h"
 
 #define BAUDN 9
@@ -80,7 +79,7 @@ main (int argc, char *argv[])
           printf ("Usage:  ttylog [-b|--baud] [-d|--device] [-f|--flush] [-s|--stamp] [-t|--timeout] > /path/to/logfile\n");
           printf (" -h, --help	This help\n -v, --version	Version number\n -b, --baud	Baud rate\n");
           printf (" -d, --device	Serial device (eg. /dev/ttyS1)\n -f, --flush	Flush output\n");
-          printf (" -s, --stamp\tPrefix each line with Epoc Microseconds timestamp\n");
+          printf (" -s, --stamp\tPrefix each line with timestamp\n");
           printf (" -t, --timeout  How long to run, in seconds.\n");
           printf ("ttylog home page: <http://ttylog.sourceforge.net/>\n\n");
           exit (0);
@@ -222,7 +221,7 @@ main (int argc, char *argv[])
           if (stamp)
             {
               gettimeofday(&tv, NULL);
-              sprintf(timestr, "%ld", tv.tv_sec*(int)1e6 + tv.tv_usec);
+              sprintf(timestr, "%f", tv.tv_sec + (double)tv.tv_usec/1e6);
               printf ("%s %s", timestr, line);
             } else {
               fputs (line, stdout);
